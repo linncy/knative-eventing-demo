@@ -1,0 +1,102 @@
+# -------- Step 1 --------
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: step1
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+    spec:
+      containers:
+      - image: docker.io/changyuan/kn-event-step-demo:latest
+        env:
+        - name: STEP_NAME
+          value: "step1"
+---
+# -------- Step 2 --------
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: step2
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+    spec:
+      containers:
+      - image: docker.io/changyuan/kn-event-step-demo:latest
+        env:
+        - name: STEP_NAME
+          value: "step2"
+---
+# -------- Step 3 --------
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: step3
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+    spec:
+      containers:
+      - image: docker.io/changyuan/kn-event-step-demo:latest
+        env:
+        - name: STEP_NAME
+          value: "step3"
+---
+# -------- Step 4 --------
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: step4
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+    spec:
+      containers:
+      - image: docker.io/changyuan/kn-event-step-demo:latest
+        env:
+        - name: STEP_NAME
+          value: "step4"
+---
+# -------- Step 5 --------
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: step5
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+    spec:
+      containers:
+      - image: docker.io/changyuan/kn-event-step-demo:latest
+        env:
+        - name: STEP_NAME
+          value: "step5"
+---
+# -------- Sequence (each step uses URL/URI to reference its own Knative Service) --------
+apiVersion: flows.knative.dev/v1
+kind: Sequence
+metadata:
+  name: five-step-seq
+spec:
+  channelTemplate:
+    apiVersion: messaging.knative.dev/v1
+    kind: InMemoryChannel
+  steps:
+    - uri: http://step1.${NAMESPACE}.svc.cluster.local/process
+      delivery:
+        retry: 3
+    - uri: http://step2.${NAMESPACE}.svc.cluster.local/process
+    - uri: http://step3.${NAMESPACE}.svc.cluster.local/process
+    - uri: http://step4.${NAMESPACE}.svc.cluster.local/process
+    - uri: http://step5.${NAMESPACE}.svc.cluster.local/process
